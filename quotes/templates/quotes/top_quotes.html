@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Топ 10 цитат</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+        }
+
+        .quote-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .quote-item {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .quote-rank {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .quote-content {
+            flex-grow: 1;
+        }
+
+        .quote-text {
+            font-size: 1.2rem;
+            font-style: italic;
+            margin: 0 0 10px;
+        }
+
+        .quote-source {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .quote-likes {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #28a745;
+            white-space: nowrap;
+        }
+
+        .empty-message {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-link {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Топ 10 цитат по лайкам</h1>
+        
+        {% if top_quotes %}
+            <ol class="quote-list">
+                {% for quote in top_quotes %}
+                    <li class="quote-item">
+                        <span class="quote-rank">{{ forloop.counter }}.</span>
+                        <div class="quote-content">
+                            <p class="quote-text">"{{ quote.text }}"</p>
+                            <p class="quote-source">- {{ quote.source|default:"Неизвестен" }}</p>
+                        </div>
+                        <span class="quote-likes">👍 {{ quote.likes }}</span>
+                    </li>
+                {% endfor %}
+            </ol>
+        {% else %}
+            <div class="empty-message">
+                <p>Нет цитат для отображения.</p>
+            </div>
+        {% endif %}
+
+        <a href="{% url 'quotes:random_quote' %}" class="back-link">Вернуться к случайной цитате</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Топ 5 источников</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+        }
+
+        .source-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .source-item {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .source-rank {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .source-content {
+            flex-grow: 1;
+        }
+
+        .source-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .source-likes {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #28a745;
+            white-space: nowrap;
+        }
+
+        .empty-message {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-link {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            margin-top: 30px;
+        }
+        .back-link:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Топ 5 источников по лайкам</h1>
+        
+        {% if top_sources %}
+            <ol class="source-list">
+                {% for source in top_sources %}
+                    <li class="source-item">
+                        <span class="source-rank">{{ forloop.counter }}.</span>
+                        <div class="source-content">
+                            <p class="source-name">{{ source.source }}</p>
+                        </div>
+                        <span class="source-likes">👍 {{ source.total_likes }}</span>
+                    </li>
+                {% endfor %}
+            </ol>
+        {% else %}
+            <div class="empty-message">
+                <p>Пока нет данных для отображения.</p>
+            </div>
+        {% endif %}
+
+        <a href="{% url 'quotes:random_quote' %}" class="back-link">На главную</a>
+    </div>
+</body>
+</html>
