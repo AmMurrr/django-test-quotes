@@ -197,6 +197,73 @@
         .comment-form button:hover {
             background-color: #218838;
         }
+
+        /* Окно оценки */
+        .modal {
+        position: fixed;
+        z-index: 1000;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex; justify-content: center; align-items: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+        background: white; 
+        padding: 30px 40px; 
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+        position: relative;
+        
+        }
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+        .modal-content h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: #333;
+        }
+        #stars {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .star { 
+            background: none;
+            border: none;
+            font-size: 2.5rem;
+            cursor: pointer;
+            padding: 0;
+            color: #ccc;
+        
+        }
+        .star:hover {
+            transform: scale(1.2);
+            color: #ffc107;
+        }
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #aaa;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .close-modal:hover {
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -273,8 +340,10 @@
                 }
                 return cookieValue;
             }
-            const csrftoken = getCookie('csrftoken');
+            // Получаем csrf токен
+            const csrftoken = getCookie('csrftoken'); 
 
+            // Лайки и дизлайки
             async function handleVote(url) {
                 try {
                     const response = await fetch(url, {
@@ -294,19 +363,79 @@
                     console.error('There was a problem with the fetch operation:', error);
                 }
             }
-
+            // Клики на лайк
             likeBtn.addEventListener('click', function() {
                 const quoteId = this.dataset.quoteId;
                 const url = `/like/${quoteId}/`;
                 handleVote(url);
             });
-
+            // Клики на дизлайк
             dislikeBtn.addEventListener('click', function() {
                 const quoteId = this.dataset.quoteId;
                 const url = `/dislike/${quoteId}/`;
                 handleVote(url);
             });
+
+            const ratingModal = document.getElementById("rating-modal");
+            const closeModalBtn = document.querySelector(".close-modal");
+
+            // Время перед показом окна оценки
+            setTimeout(() => {
+                if(ratingModal) ratingModal.classList.add("show");
+            }, 3000);
+
+            // Закрытие окна по крестику
+            if(closeModalBtn) {
+                closeModalBtn.addEventListener("click", () => {
+                    ratingModal.classList.remove("show");
+                });
+            }
+
+            // обработка нажатия на кнопку оценки
+            document.querySelectorAll(".star").forEach(btn => {
+            btn.addEventListener("click", function() {
+                let score = this.getAttribute("data-score"); // получаем оценку
+
+                fetch("{% url 'quotes:submit_rating' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrftoken,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: "score=" + score
+                })
+                .then(r => r.json()) // получаем ответ
+                .then(data => {
+                if (data.success) {
+                    ratingModal.classList.remove("show"); // закрываем окно
+                } else {
+                    alert("Ошибка при отправке оценки");
+                }
+                });
+            });
+            });
+
+            
         });
     </script>
+
+<!-- Окно оценки-->
+<div id="rating-modal" class="modal">
+    <div class="modal-content">
+        <button class="close-modal">&times;</button>
+        <h2>Оцените наш сайт</h2>
+        <div id="stars">
+            {% for i in "12345" %}
+                <button class="star" data-score="{{ i }}">⭐</button>
+            {% endfor %}
+        </div>
+    </div>  
+</div>
+    
+
+
+
+
+
 </body>
 </html>

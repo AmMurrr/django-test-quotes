@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.db.models import F, Sum
-from .models import Quote, PageView, Comment
+from .models import Quote, PageView, Comment, Rating
 from django.http import Http404, JsonResponse
 import random
 
@@ -126,3 +126,12 @@ def add_comment(request, quote_id):
             Comment.objects.create(quote=quote, text=text, author=author)
 
     return redirect(request.META.get('HTTP_REFERER', 'quotes:random_quote'))
+
+
+def submit_rating(request):
+    if request.method == 'POST':
+        score = int(request.POST.get('score', 0))
+        if 1 <= score <= 5:
+            Rating.objects.create(score=score)
+            return JsonResponse({"success": True})
+    return JsonResponse({"success": False}, status=400) 

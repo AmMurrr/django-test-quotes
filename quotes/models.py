@@ -53,3 +53,9 @@ class Comment(models.Model):
     def __str__(self):
         return f'Comment on "{self.quote.text}" at {self.created_at}'
     
+class Rating(models.Model):
+    score = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.score}'

@@ -11,4 +11,5 @@ urlpatterns = [
     path('like/<int:quote_id>/', views.like_quote, name='like_quote'),
     path('dislike/<int:quote_id>/', views.dislike_quote, name='dislike_quote'),
     path('comment/add/<int:quote_id>/', views.add_comment, name='add_comment'),
+    path('rate/', views.submit_rating, name='submit_rating'),
 ]
