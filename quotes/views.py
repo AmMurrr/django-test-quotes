@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from django.db.models import F, Sum
+from django.db.models.functions import Lower
 from .models import Quote, PageView, Comment, Rating
 from django.http import Http404, JsonResponse
 import random
@@ -88,10 +89,16 @@ def add_quote_view(request):
         text = request.POST.get('text', '').strip()
         source = request.POST.get('source', '').strip()
         weight = int(request.POST.get('weight', 1))
-        if Quote.objects.filter(text=text).exists(): # Фильтруем дубли
+        
+        # SQLite не поддерживает регистронезависимый поиск для кириллицы
+        # Поэтому получаем все цитаты и проверяем на дубликаты вручную
+        all_quotes = Quote.objects.all()
+        if any(q.text.lower() == text.lower() for q in all_quotes):
             return render(request, 'quotes/add_quote.html', {'error': 'Цитата уже существует.'})
 
-        if Quote.objects.filter(source=source).count() >= 3: # Фильтруем источники, у которых больше 3 цитат
+        # Аналогичная ручная проверка для источников из-за особенностей SQLite
+        source_quotes_count = sum(1 for q in all_quotes if q.source.lower() == source.lower())
+        if source_quotes_count >= 3:
             return render(request, 'quotes/add_quote.html', {'error': 'У этого источника уже есть 3 цитаты.'})
 
         Quote.objects.create(text=text, source=source, weight=weight)
@@ -134,4 +141,4 @@ def submit_rating(request):
         if 1 <= score <= 5:
             Rating.objects.create(score=score)
             return JsonResponse({"success": True})
-    return JsonResponse({"success": False}, status=400) 
+    return JsonResponse({"success": False}, status=400)

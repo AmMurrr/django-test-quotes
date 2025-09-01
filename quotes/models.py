@@ -1,14 +1,14 @@
 from django.db import models
 from django.db.models import F
+from django.db.models.functions import Lower
 
- # модель для цитат
+# модель для цитат
 class Quote(models.Model):
-    text = models.TextField(unique=True)
+    text = models.TextField()  # убрали unique=True
     source = models.CharField(max_length=255)
     weight = models.PositiveIntegerField(default=1)
     likes = models.PositiveIntegerField(default=0)
     dislikes = models.PositiveIntegerField(default=0)
-
 
     def update_likes(self, change=1):
         Quote.objects.filter(id=self.id).update(likes=F('likes') + change)
@@ -18,10 +18,9 @@ class Quote(models.Model):
         Quote.objects.filter(id=self.id).update(dislikes=F('dislikes') + change)
         self.refresh_from_db()
 
-
-
     def __str__(self):
         return f'"{self.text}" - {self.source}'
+
 
 # для счётчика просмотров страниц
 class PageView(models.Model):

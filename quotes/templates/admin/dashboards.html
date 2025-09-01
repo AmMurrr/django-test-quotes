@@ -1,0 +1,96 @@
+{% extends "admin/base_site.html" %} 
+{% block title %}Аналитика{% endblock %}
+{% block extrahead %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  .dashboard-wrapper {padding:20px;}
+  .chart-box, .table-box {background:#fff;padding:16px;margin-bottom:24px;border:1px solid #e0e0e0;border-radius:6px;}
+  .rating-table {border-collapse:collapse;width:300px;}
+  .rating-table th, .rating-table td {border:1px solid #ccc;padding:6px 10px;text-align:center;}
+  .rating-table th {background:#f5f5f5;}
+  .flex-row {display:flex;flex-wrap:wrap;gap:24px;}
+  .half {flex:1;min-width:340px;}
+</style>
+{% endblock %}
+{% block content %}
+<div class="dashboard-wrapper">
+  <h1>Аналитика</h1>
+  <div class="flex-row">
+    <div class="chart-box half">
+      <h2>Распределение оценок</h2>
+      <canvas id="ratingChart" height="140"></canvas>
+    </div>
+    <div class="table-box half">
+      <h2>Число поставленных оценок</h2>
+      <table class="rating-table" id="ratingTable">
+        <thead>
+          <tr><th>Оценка (звёзд)</th><th>Количество</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="flex-row">
+    <div class="chart-box half">
+      <h2>Просмотры страниц</h2>
+      <canvas id="viewsChart" height="140"></canvas>
+    </div>
+    <div class="table-box half">
+      <h2>Таблица просмотров</h2>
+      <table class="rating-table" id="viewsTable">
+        <thead>
+          <tr><th>Страница</th><th>Просмотры</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+  // Данные оценок
+  const ratingLabels = JSON.parse('{{ rating_labels|escapejs }}');
+  const ratingData = JSON.parse('{{ rating_data|escapejs }}');
+
+  // Таблица оценок
+  const tbody = document.querySelector('#ratingTable tbody');
+  ratingLabels.forEach((lbl, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${lbl}</td><td>${ratingData[i] ?? 0}</td>`;
+    tbody.appendChild(tr);
+  });
+  const total = ratingData.reduce((a,b)=>a+b,0);
+  const trTotal = document.createElement('tr');
+  trTotal.innerHTML = `<th>Всего</th><th>${total}</th>`;
+  tbody.appendChild(trTotal);
+
+  // График оценок
+  new Chart(document.getElementById('ratingChart').getContext('2d'), {
+    type: 'bar',
+    data: { labels: ratingLabels.map(v => v + '★'), datasets: [{ data: ratingData, backgroundColor: 'rgba(54,162,235,0.6)', borderColor: 'rgba(54,162,235,1)', borderWidth:1 }] },
+    options: { scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }, plugins:{ legend:{ display:false } } }
+  });
+
+  // Данные просмотров
+  const viewLabels = JSON.parse('{{ page_view_labels|default:"[]"|escapejs }}');
+  const viewData = JSON.parse('{{ page_view_data|default:"[]"|escapejs }}');
+
+  // Таблица просмотров
+  const vtbody = document.querySelector('#viewsTable tbody');
+  viewLabels.forEach((lbl, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${lbl}</td><td>${viewData[i] ?? 0}</td>`;
+    vtbody.appendChild(tr);
+  });
+  const viewsTotal = viewData.reduce((a,b)=>a+b,0);
+  const vtrTotal = document.createElement('tr');
+  vtrTotal.innerHTML = `<th>Всего</th><th>${viewsTotal}</th>`;
+  vtbody.appendChild(vtrTotal);
+
+  // График просмотров (горизонтальный)
+  new Chart(document.getElementById('viewsChart').getContext('2d'), {
+    type: 'bar',
+    data: { labels: viewLabels, datasets: [{ data: viewData, backgroundColor: 'rgba(255,159,64,0.6)', borderColor: 'rgba(255,159,64,1)', borderWidth:1 }] },
+    options: { indexAxis: 'y', scales:{ x:{ beginAtZero:true, ticks:{ precision:0 } } }, plugins:{ legend:{ display:false } } }
+  });
+</script>
+{% endblock %}
