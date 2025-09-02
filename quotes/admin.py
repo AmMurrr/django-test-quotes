@@ -51,7 +51,7 @@ class MyAdminSite(admin.AdminSite):
 
 admin_site = MyAdminSite(name='myadmin')
 
-# Прокси-модель для отображения ссылки на дэшборд как стандартной кнопки
+# Прокси-модель для отображения ссылки на дэшборд 
 class Dashboard(Rating):
     class Meta:
         proxy = True

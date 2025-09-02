@@ -2,7 +2,7 @@
 
 set -e
 
-if [$# -ne 2]; then
+if [ $# -ne 2 ]; then
     echo "Использование: ./run.sh <email> <password>"
     exit 1
 fi
@@ -32,7 +32,7 @@ DJANGO_SUPERUSER_EMAIL=$1
 DJANGO_SUPERUSER_PASSWORD=$2
 DJANGO_SUPERUSER_USERNAME="admin"
 
-python manage.py createsuperuser --noinput || true
+python manage.py createsuperuser --noinput --username $DJANGO_SUPERUSER_USERNAME --email $DJANGO_SUPERUSER_EMAIL || true
 
 
 

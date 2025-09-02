@@ -4,7 +4,7 @@ from django.db.models.functions import Lower
 
 # модель для цитат
 class Quote(models.Model):
-    text = models.TextField()  # убрали unique=True
+    text = models.TextField()  
     source = models.CharField(max_length=255)
     weight = models.PositiveIntegerField(default=1)
     likes = models.PositiveIntegerField(default=0)
@@ -51,7 +51,8 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Comment on "{self.quote.text}" at {self.created_at}'
-    
+
+# модель для оценок сайта 
 class Rating(models.Model):
     score = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
